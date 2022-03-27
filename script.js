@@ -23,6 +23,24 @@ document.body.setAttribute("oncontextmenu", "return false");
 
 
 
+
+var getCircularReplacer = () => {
+    const seen = new WeakSet();
+    return (key, value) => {
+      if (typeof value === "object" && value !== null) {
+        if (seen.has(value)) {
+          return;
+        }
+        seen.add(value);
+      }
+      return value;
+    };
+};
+
+
+
+
+
 var sound_start_game_1 = new Audio("source/start_game_1.mp3");
 var sound_start_game_2 = new Audio("source/start_game_2.mp3");
 var sound_start_game_3 = new Audio("source/start_game_3.mp3");
@@ -48,6 +66,8 @@ function sound_start_game(){
         }, true)
     }, true)
 }
+
+
 
 
 
@@ -100,26 +120,35 @@ document.getElementById("button_control").addEventListener('click', function () 
 document.getElementById("button_main_play").addEventListener('click', function () {
     $("#main").fadeOut();
 
-    if(sessionStorage.user !== undefined){
-        var url = 'https://gta-via-drobik.herokuapp.com/';
+    document.getElementById("login_form").style.visibility = "visible";
+    document.getElementById("login_form").style.display = "";
+    
+
+    if(sessionStorage.token !== undefined){
+        var url = 'https://gta-via-drobik.herokuapp.com/sing_in_token';
         
-        var email = (JSON.parse(sessionStorage.user)[0]).toLowerCase();
-        var password = JSON.parse(sessionStorage.user)[1];
+        var ip = sessionStorage.getItem('ip');
+        var agent = navigator.userAgent;
+
+        var token = JSON.parse(sessionStorage.token)[0];
+        var password_to_token = JSON.parse(sessionStorage.password_to_token)[0];
 
         var content = {
-            "do": "1",
-            "email": email,
-            "password": password
+            "ip": ip,
+            "agent": agent,
+            "token": token,
+            "password_to_token": password_to_token
         };
 
+      
         $.post(url, content, function(data, status){
             data = JSON.parse(data);
-
-            if(data[0] == "Bad"){
+            if(data['1'] == "Bad"){
                 log(1);
+                sessionStorage.clear();
+                document.location.reload(true);
             }
-            else if(data[0] == "OK"){
-                window.sessionStorage.setItem('user', JSON.stringify([data[1], data[2], data[3]]));
+            else if(data['1'] == "OK"){
                 logged();
             }
             else {
@@ -128,11 +157,40 @@ document.getElementById("button_main_play").addEventListener('click', function (
 
         })
     }
-    
 
-    document.getElementById("login_form").style.visibility = "visible";
-    document.getElementById("login_form").style.display = "";
+    else {
+        $.getJSON("https://api.ipify.org?format=json", function(data) {
+            var ip = data.ip;
+            var agent = navigator.userAgent;
 
+            window.sessionStorage.setItem('ip', ip);
+
+            var content = {
+                "ip": ip,
+                "agent": agent
+            };
+
+            var url = 'https://gta-via-drobik.herokuapp.com/login_key';
+
+            $.post(url, content, function(data, status){
+                data = JSON.parse(data);
+
+                console.log(data);
+                if(data['1'] == "Bad"){
+                    log(1);
+                    sessionStorage.clear();
+                    document.location.reload(true);
+                }
+                else if(data['1'] == "OK"){
+                    window.sessionStorage.setItem('key', JSON.stringify([data['key']]));
+                }
+                else {
+                    alert("Oops ... Server Error !!!");
+                }
+
+            })
+        })
+    }
 
 
     document.getElementById("sing_in").addEventListener("click", function(){
@@ -148,25 +206,38 @@ document.getElementById("button_main_play").addEventListener('click', function (
 
         if(check_input()){
 
-            var url = 'https://gta-via-drobik.herokuapp.com/';
+            var ip = sessionStorage.getItem('ip');
+            var agent = navigator.userAgent;
+
+            var url = 'https://gta-via-drobik.herokuapp.com/sing_in';
             
             var email = (document.getElementById("input_1").value).toLowerCase();
             var password = document.getElementById("input_2").value;
 
+            var key = JSON.parse(sessionStorage.getItem('key'))[0]; 
+            
+
             var content = {
-                "do": "1",
-                "email": email,
-                "password": password
+                "ip": ip,
+                "agent": agent,
+                "email": CryptoJS.AES.encrypt(email, key).toString(),
+                "password": CryptoJS.AES.encrypt(password, key).toString(),
             };
+
+
 
             $.post(url, content, function(data, status){
                 data = JSON.parse(data);
 
-                if(data[0] == "Bad"){
+                console.log(data);
+
+                if(data['1'] == "Bad"){
                     log(1);
                 }
-                else if(data[0] == "OK"){
-                    window.sessionStorage.setItem('user', JSON.stringify([data[1], data[2], data[3]]));
+                else if(data['1'] == "OK"){
+                    window.sessionStorage.setItem('token', JSON.stringify([data['token']]));
+                    window.sessionStorage.setItem('password_to_token', JSON.stringify([data['password_to_token']]));
+                    window.sessionStorage.setItem('name_user', JSON.stringify([data['name']]));
                     logged();
                 }
                 else {
@@ -193,10 +264,10 @@ document.getElementById("button_main_play").addEventListener('click', function (
 
         if(email.includes("@") && email.includes(".") && password !== null && username.length >= 5){
             if(Number(window.sessionStorage.created_account) > 5){
-                alert()
+                alert("On this device you have already created the maximum number of accounts - 5");
             }
             else{
-                send_request("On this device you have already created the maximum number of accounts - 5");
+                send_request();
             }
         }
         else if(!(username.length >= 5)){
@@ -212,24 +283,30 @@ document.getElementById("button_main_play").addEventListener('click', function (
 
         function send_request(){
 
-            var url = 'https://gta-via-drobik.herokuapp.com/';
+            var url = 'https://gta-via-drobik.herokuapp.com/sing_up';
             
+            var ip = sessionStorage.getItem('ip');
+            var agent = navigator.userAgent;
+
             var username = document.getElementById("input_3").value;
             var email = (document.getElementById("input_4").value).toLowerCase();
             var password = document.getElementById("input_5").value;
 
+            var key = JSON.parse(sessionStorage.getItem('key'))[0]; 
+
             var content = {
-                "do": "2",
-                "name" : username,
-                "email": email,
-                "password": password
+                "ip": ip,
+                "agent": agent,
+                "username" : CryptoJS.AES.encrypt(username, key).toString(),
+                "email": CryptoJS.AES.encrypt(email, key).toString(),
+                "password": CryptoJS.AES.encrypt(password, key).toString()
             };
 
             $.post(url, content, function(data, status){
-                if(data == '["Bad_email"]'){
+                if(data == "Bad_email"){
                     log(5);
                 }
-                else if(data == '["Bad_name"]'){
+                else if(data == "Bad_name"){
                     log(6);
                 }
                 else if(data == "Bad"){
@@ -243,6 +320,8 @@ document.getElementById("button_main_play").addEventListener('click', function (
                         window.sessionStorage.setItem("created_account", Number(1));
                     }
 
+                    container.classList.remove("right-panel-active");
+
                     log(20);
                 }
                 else {
@@ -253,6 +332,7 @@ document.getElementById("button_main_play").addEventListener('click', function (
         }
         
     })
+    
 
 });
 
@@ -315,7 +395,7 @@ function logged(){
     var menu = document.createElement("div");
     document.body.appendChild(menu);
     menu.setAttribute("id", "menu");
-    menu.innerHTML = "<h1>Witaj: " + JSON.parse(window.sessionStorage.getItem('user'))[2] + "!</h1>" + "<div id='menu_child'> <div id='menu_child_1'><a class='btn-slice'> <div class='top'><span>Singleplayer</span></div><div class='bottom'><span>Singleplayer</span></div></a></div>       <div style='pointer-events:none;' id='menu_child_2'><a class='btn-slice'> <div class='top'><span>Multiplayer</span></div><div class='bottom'><span>Multiplayer</span></div></a></div>  </div>        <div id='log_out'> <a class='btn-slice'> <div class='top'><span>Log out</span></div><div class='bottom'><span>Log out</span></div></a></div>";
+    menu.innerHTML = "<h1>Witaj: " + JSON.parse(window.sessionStorage.getItem('name_user'))[0] + "!</h1>" + "<div id='menu_child'> <div id='menu_child_1'><a class='btn-slice'> <div class='top'><span>Singleplayer</span></div><div class='bottom'><span>Singleplayer</span></div></a></div>       <div style='pointer-events:none;' id='menu_child_2'><a class='btn-slice'> <div class='top'><span>Multiplayer</span></div><div class='bottom'><span>Multiplayer</span></div></a></div>  </div>        <div id='log_out'> <a class='btn-slice'> <div class='top'><span>Log out</span></div><div class='bottom'><span>Log out</span></div></a></div>";
 
     document.getElementById("menu_child_1").addEventListener("click", function(){
         step_2();
@@ -329,13 +409,20 @@ function logged(){
 
 
     document.getElementById("log_out").addEventListener("click", function(){
+        var url = 'https://gta-via-drobik.herokuapp.com/close_session';
+        var content = {
+            "ip": sessionStorage.getItem('ip'),
+            "agent": navigator.userAgent,
+        };
+        $.post(url, content, function(data, status){})
+
         window.sessionStorage.clear();
         location.reload();
     }, { once: true });
 
 
     function step_2(){
-        menu.innerHTML = "<h1>Witaj: " + JSON.parse(window.sessionStorage.getItem('user'))[2] + "!</h1>" + "<div id='menu_child'> <div id='menu_child_1'><a class='btn-slice'> <div class='top'><span>New game</span></div><div class='bottom'><span>New game</span></div></a></div>       <div id='menu_child_2'><a class='btn-slice'> <div class='top'><span>Load save</span></div><div class='bottom'><span>Load save</span></div></a></div>  </div>             <div id='log_out'> <a class='btn-slice'> <div class='top'><span>Log out</span></div><div class='bottom'><span>Log out</span></div></a></div>";
+        menu.innerHTML = "<h1>Witaj: " + JSON.parse(window.sessionStorage.getItem('name_user'))[0] + "!</h1>" + "<div id='menu_child'> <div id='menu_child_1'><a class='btn-slice'> <div class='top'><span>New game</span></div><div class='bottom'><span>New game</span></div></a></div>       <div id='menu_child_2'><a class='btn-slice'> <div class='top'><span>Load save</span></div><div class='bottom'><span>Load save</span></div></a></div>  </div>             <div id='log_out'> <a class='btn-slice'> <div class='top'><span>Log out</span></div><div class='bottom'><span>Log out</span></div></a></div>";
 
         document.getElementById("menu_child_1").addEventListener("click", function(){
             window.sessionStorage.setItem('record', "new");
@@ -345,6 +432,19 @@ function logged(){
         document.getElementById("menu_child_2").addEventListener("click", function(){
             window.sessionStorage.setItem('record', "saved");
             window.location.href = "play/index.html";
+        }, { once: true });
+
+
+        document.getElementById("log_out").addEventListener("click", function(){
+            var url = 'https://gta-via-drobik.herokuapp.com/close_session';
+            var content = {
+                "ip": sessionStorage.getItem('ip'),
+                "agent": navigator.userAgent,
+            };
+            $.post(url, content, function(data, status){})
+            
+            window.sessionStorage.clear();
+            location.reload();
         }, { once: true });
     }
 
