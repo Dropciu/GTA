@@ -463,10 +463,10 @@ Pocisk.prototype.display = function(){
             top: this.y
         });
 
-        // if(granica_1(this) || granica_2(this) || granica_3(this) || granica_4(this)){
-        //     $(this.element).remove();
-        //     clearInterval(interval);
-        // }
+        if(granica_1(this) || granica_2(this) || granica_3(this) || granica_4(this)){
+            $(this.element).remove();
+            clearInterval(interval);
+        }
     
         for(var i = 0; i < tab_osoby.length; i++){
             if(isCollide(this, tab_osoby[i])){
@@ -543,67 +543,6 @@ var b = new Bohater(window.innerWidth / 2, window.innerHeight / 2);
 
 
 
-function granica_1(a){
-    if(a.pozycja_y <= t.height / 40){
-        return true;
-    }
-    if(a.pozycja_x >= 0 && a.pozycja_x <= t.width / 3.7628797 - a.width / 3 && a.pozycja_y <= t.height / 6.1857142 - a.height / 3){
-        return true;
-    }
-    if(a.pozycja_x >= t.width / 2.8286991 - a.width / 2 && a.pozycja_x <= t.width / 2.1987649 - a.width / 3 && a.pozycja_y <= t.height / 5.95189 - a.height / 3){
-        return true;
-    }
-    if(a.pozycja_x >= t.width / 1.6508258 - a.width / 2 && a.pozycja_x <= t.width / 1.4626444 - a.width / 3 && a.pozycja_y <= t.height / 5.6601307 - a.height / 3){
-        return true;
-    }    
-    if(a.pozycja_x >= t.width / 1.4622689 - a.width / 2 && a.pozycja_x <= t.width / 1.0601042 - a.width / 3 && a.pozycja_y <= t.height / 9.8971428 - a.height / 3){
-        return true;
-    }    
-    if(a.pozycja_x >= t.width / 1.0599069 - a.width / 2 && a.pozycja_x <= t.width - a.width / 3 && a.pozycja_y <= t.height / 5.6601307 - a.height / 3){
-        return true;
-    }
-}
-
-function granica_2(a){
-    if(a.pozycja_x < 0){
-        return true;
-    }
-    if(a.pozycja_x >= t.width / 4.7474 && a.pozycja_x <= t.width / 3.7653668 && a.pozycja_y <= t.height / 6.1857142 - a.height / 2){
-        return true;
-    }
-    if(a.pozycja_x >= t.width / 2.1987649 - 2 * a.width && a.pozycja_x <= t.width / 2.1987649 - a.width / 4 && a.pozycja_y <= t.height / 5.95189 - a.height){
-        return true;
-    }
-    if(a.pozycja_x >= t.width / 1.4622689 -  2 * a.width && a.pozycja_x <= t.width / 1.4622689 - a.width / 4 && a.pozycja_y <= t.height / 6.1857142 - a.height / 2){
-        return true;
-    }
-
-}
-
-function granica_3 (a){
-    if(a.pozycja_x > t.width){
-        return true;
-    }
-    if(a.pozycja_x >= t.width / 2.8286991 - a.width / 1.4 && a.pozycja_x <= t.width / 2.73 && a.pozycja_y <= t.height / 5.95189 - a.height){
-        return true;
-    };
-    if(a.pozycja_x >= t.width / 1.6508258 - a.width / 1.4  && a.pozycja_x <= t.width / 1.61 && a.pozycja_y <= t.height / 5.6601307 - a.height){
-        return true;
-    };
-    if(a.pozycja_x >= t.width / 1.0599069 - a.width / 1.4  && a.pozycja_x <= t.width / 1.043 && a.pozycja_y <= t.height / 5.6601307 - a.height){
-        return true;
-    };
-}
-
-function granica_4 (a){
-    if(a.pozycja_y >= t.height - t.height / 15){
-        return true;
-    }
-}
-
-
-
-
 
 
 
@@ -673,6 +612,10 @@ Tło.prototype.right = function (){
             tab_auta[i].pozycja_x += speed;
         }
 
+        for(var i = 0; i < tab_borders.length; i++){
+            tab_borders[i].x += speed; 
+        }
+
     };
 }
 Tło.prototype.left = function (){
@@ -705,6 +648,10 @@ Tło.prototype.left = function (){
         for(var i = 0; i < tab_auta.length; i++){
             tab_auta[i].x -= speed; 
             tab_auta[i].pozycja_x -= speed;
+        }
+
+        for(var i = 0; i < tab_borders.length; i++){
+            tab_borders[i].x -= speed; 
         }
 
         this.element.css ({
@@ -741,6 +688,10 @@ Tło.prototype.bottom = function (){
             tab_auta[i].pozycja_y += speed;
         }
 
+        for(var i = 0; i < tab_borders.length; i++){
+            tab_borders[i].y += speed; 
+        }
+
         this.element.css ({
             top: this.y,
         });
@@ -775,6 +726,10 @@ Tło.prototype.top = function (){
             tab_auta[i].pozycja_y -= speed;
         }
 
+        for(var i = 0; i < tab_borders.length; i++){
+            tab_borders[i].y -= speed; 
+        }
+
         this.element.css ({
             top: this.y,
         });
@@ -786,3 +741,78 @@ Tło.prototype.top = function (){
 var t = new Tło(0, 0);
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var border = function(x, y, width, height){
+    this.x = x;
+    this.y = y;
+    this.width = width - x;
+    this.height = height - y; 
+}
+
+var a = b;
+
+var border1 = new border(0, 0, t.width / 3.7628797 - a.width / 3,t.height / 6.1857142 - a.height / 3);
+var border2 = new border(t.width / 2.8286991 - a.width / 2 , 0, t.width / 2.1987649 - a.width / 3 ,t.height / 5.95189 - a.height / 3);
+var border3 = new border(t.width / 1.6508258 - a.width / 2, 0, t.width / 1.4626444 - a.width / 3, t.height / 5.6601307 - a.height / 3);
+var border4 = new border(t.width / 1.4622689 - a.width / 2, 0, t.width / 1.0601042 - a.width / 3, t.height / 9.8971428 - a.height / 3);
+var border5 = new border(t.width / 1.0599069 - a.width / 2, 0, t.width - a.width / 3, t.height / 5.6601307 - a.height / 3);
+
+var border6 = new border(t.width / 4.7474, 0, t.width / 3.7653668, t.height / 6.1857142 - a.height / 2);
+var border7 = new border(t.width / 2.1987649 - 2 * a.width, 0, t.width / 2.1987649 - a.width / 4, t.height / 5.95189 - a.height);
+var border8 = new border(t.width / 1.4622689 -  2 * a.width, 0, t.width / 1.4622689 - a.width / 4, t.height / 6.1857142 - a.height / 2);
+
+var border9 = new border(t.width / 2.8286991 - a.width / 1.4, 0, t.width / 2.73, t.height / 5.95189 - a.height);
+var border10 = new border(t.width / 1.6508258 - a.width / 1.4, 0, t.width / 1.61, t.height / 5.6601307 - a.height);
+var border11 = new border(t.width / 1.0599069 - a.width / 1.4, 0, t.width / 1.043, t.height / 5.6601307 - a.height);
+
+var border12 = new border(0, t.height - t.height / 15, t.width, t.height);
+
+
+
+
+var tab_borders = [border1, border2, border3, border4, border5, border6, border7, border8, border9, border10, border11, border12];
+
+
+
+
+function granica_1(a){
+    if(isCollide(a, border1) || isCollide(a, border2) || isCollide(a, border3) || isCollide(a, border4) ||isCollide(a, border5)){
+        return true;
+    }
+
+}
+
+function granica_2(a){
+    if(isCollide(a, border6) || isCollide(a, border7) || isCollide(a, border8)){
+        return true;
+    }
+}
+
+function granica_3(a){
+    if(isCollide(a, border9) || isCollide(a, border10) || isCollide(a, border11) ){
+        return true;
+    }
+}
+
+function granica_4(a){
+    if(isCollide(a, border12)){
+        return true;
+    }
+}

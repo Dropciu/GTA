@@ -5,35 +5,83 @@ document.body.setAttribute("oncontextmenu", "return false");
 
 
 
-if(sessionStorage.user !== undefined && sessionStorage.mode != null && sessionStorage.record != null){
-  if(sessionStorage.mode == "single"){
-    if(sessionStorage.record == "new"){
-      load();
-    }
-    else if(sessionStorage.record == "saved"){
-      var url = 'https://gta-via-drobik.herokuapp.com/';
-        
-      var email = (JSON.parse(sessionStorage.user)[0]).toLowerCase();
-      var password = JSON.parse(sessionStorage.user)[1];
 
-      var content = {
-          "do": "3",
-          "email": email,
-          "password": password
+if ((new URLSearchParams(window.location.search).get('i')) == 1){
+  play();
+}
+else if(sessionStorage.token !== undefined && sessionStorage.mode != null && sessionStorage.record != null){
+
+  var url = 'https://gta-via-drobik.herokuapp.com/sing_in_token';
+        
+  var ip = sessionStorage.getItem('ip');
+  var agent = navigator.userAgent;
+
+  var token = JSON.parse(sessionStorage.token)[0];
+  var password_to_token = JSON.parse(sessionStorage.password_to_token)[0];
+
+  var content = {
+      "ip": ip,
+      "agent": agent,
+      "token": token,
+      "password_to_token": password_to_token
+  };
+
+
+  $.post(url, content, function(data, status){
+      data = JSON.parse(data);
+
+      if(data['1'] == "Bad"){
+        window.sessionStorage.removeItem('mode');
+        window.sessionStorage.removeItem('record');
+        window.location.href = "../index.html";
+      }
+      else if(data['1'] == "OK"){
+          load_page();
+      }
+      else {
+          alert("Oops ... Server Error !!!");
+      }
+
+  })
+    
+
+
+
+  function load_page(){
+    if(sessionStorage.mode == "single"){
+      if(sessionStorage.record == "new"){
+        load();
+      }
+      else if(sessionStorage.record == "saved"){
+        var url = 'https://gta-via-drobik.herokuapp.com/get_game';
+          
+        var ip = sessionStorage.getItem('ip');
+        var agent = navigator.userAgent;
+
+        var token = JSON.parse(sessionStorage.token)[0];
+        var password_to_token = JSON.parse(sessionStorage.password_to_token)[0];
+
+        var content = {
+          "ip": ip,
+          "agent": agent,
+          "token": token,
+          "password_to_token": password_to_token
       };
 
-      $.post(url, content, function(data, status){
-          var file_load_game = JSON.parse(data);
+        $.post(url, content, function(data, status){
+            var file_load_game = JSON.parse(data);
 
-          load2(file_load_game);
-      })
+            load2(file_load_game);
+        })
+      }
     }
   }
 }
 else {
+  window.sessionStorage.removeItem('mode');
+  window.sessionStorage.removeItem('record');
   window.location.href = "../index.html";
 }
-
 
 
 
@@ -179,6 +227,8 @@ function load2 (file_load_game){
 }
 
 
+
+
 function play(){
   $("html, body").animate({ scrollTop: t.y, scrollLeft: t.x }, "slow");
 
@@ -230,19 +280,23 @@ function play(){
 
 
 function save_game(){
-  var txt = '{"email":' + JSON.stringify(JSON.parse(sessionStorage.user)[0])     + ',\n"Data":' + JSON.stringify(new Date().toString())       + ',\n"Bohater":' + JSON.stringify(b)    + ',\n"Tlo":' + JSON.stringify(t)     +',\n"z_p_1":' + JSON.stringify(z_p_1)         +',\n"z_p_2":' + JSON.stringify(z_p_2)         +',\n"speed":' + JSON.stringify(speed)        +',\n"b_wyglad":' + JSON.stringify(b_wyglad)           + ',\n"tab_osoby":' + JSON.stringify(tab_osoby)   + ',\n"tab_trupy":' + JSON.stringify(tab_trupy)         + ',\n"tab_auta":' + JSON.stringify(tab_auta)       + '\n\n}';
+  var txt = '{"Data":' + JSON.stringify(new Date().toString())       + ',\n"Bohater":' + JSON.stringify(b)    + ',\n"Tlo":' + JSON.stringify(t)     +',\n"z_p_1":' + JSON.stringify(z_p_1)         +',\n"z_p_2":' + JSON.stringify(z_p_2)         +',\n"speed":' + JSON.stringify(speed)        +',\n"b_wyglad":' + JSON.stringify(b_wyglad)           + ',\n"tab_osoby":' + JSON.stringify(tab_osoby)   + ',\n"tab_trupy":' + JSON.stringify(tab_trupy)         + ',\n"tab_auta":' + JSON.stringify(tab_auta)       + '\n\n}';
 
-  var email = JSON.parse(sessionStorage.user)[0];
-  var password = JSON.parse(sessionStorage.user)[1];
+  var ip = sessionStorage.getItem('ip');
+  var agent = navigator.userAgent;
+
+  var token = JSON.parse(sessionStorage.token)[0];
+  var password_to_token = JSON.parse(sessionStorage.password_to_token)[0];
 
   var content = {
-      "do": "4",
-      "email": email,
-      "password": password,
+      "ip": ip,
+      "agent": agent,
+      "token": token,
+      "password_to_token": password_to_token,
       "data" : txt
   };
 
-  var url = 'https://gta-via-drobik.herokuapp.com/';
+  var url = 'https://gta-via-drobik.herokuapp.com/save_game';
 
   $.post(url, content, function(data, status){
 

@@ -172,11 +172,25 @@ Osoba.prototype.display = function(){
     
     
             if(_x >= _y){
+                if(granica_2(this) && ax < 0){
+                    ax = ax * (-1);
+                }
+                else if(granica_3(this) && ax > 0){
+                    ax = ax * 1;
+                }
+
                 this.x += ax;
                 this.pozycja_x += ax;
                 var kierunek_a = kierunek_a1;
             }
             else {
+                if(granica_1(this) && ay < 0){
+                    ay = ay * (-1);
+                }
+                else if(granica_4(this) && ay > 0){
+                    ay = ay * 1;
+                }
+
                 this.y += ay;
                 this.pozycja_y += ay; 
                 var kierunek_a = kierunek_a2; 
@@ -341,6 +355,10 @@ function resp_postaci(){
     }, 1000); 
 
 }
+
+
+
+
 
 
 
