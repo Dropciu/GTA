@@ -24,18 +24,7 @@ document.body.setAttribute("oncontextmenu", "return false");
 
 
 
-var getCircularReplacer = () => {
-    const seen = new WeakSet();
-    return (key, value) => {
-      if (typeof value === "object" && value !== null) {
-        if (seen.has(value)) {
-          return;
-        }
-        seen.add(value);
-      }
-      return value;
-    };
-};
+
 
 
 
@@ -73,6 +62,15 @@ function sound_start_game(){
 
 
 
+function loading(){
+    var loading = document.createElement("div");
+    document.getElementById("login_form").appendChild(loading);
+    loading.setAttribute("id", "loading");
+
+    loading.innerHTML = "<img src='source/loading.svg' height='90%'>";
+}
+
+
 
 
 document.getElementById("button_control").addEventListener('click', function () {
@@ -92,9 +90,9 @@ document.getElementById("button_control").addEventListener('click', function () 
     div_control.appendChild(div_control2);
     div_control2.setAttribute("id", "div_control2");
 
-    div_control1.innerHTML = "<table> <tr>  <td><img src='source/awsd.webp' width='80%'> <img src='source/strzalki.webp' width='80%'></td>  <td><h1>Movement</h1></td></tr>        <tr><td><img src='source/space.webp' width='90%'></td>  <td><h1>Jump</h1></td></tr>         <tr><td><img src='source/esc_key.webp' width='60%'></td>  <td><h1>Pause</h1></td></tr></table>";
+    div_control1.innerHTML = "<table> <tr>  <td><img src='source/awsd.webp' width='70%'> <img src='source/strzalki.webp' width='70%'></td>  <td><h1>Movement</h1></td></tr>        <tr><td><img src='source/space.webp' width='80%'></td>  <td><h1>Jump</h1></td></tr>         <tr><td><img src='source/esc_key.webp' width='50%'></td>  <td><h1>Pause</h1></td></tr></table>";
     
-    div_control2.innerHTML = "<table> <tr>  <td><img src='source/key_z.webp' width='60%'></td>  <td><h1>Hit</h1></td></tr>        <tr><td><img src='source/key_x.webp' width='60%'></td>  <td><h1>Shot</h1></td></tr></table>";
+    div_control2.innerHTML = "<table> <tr>  <td><img src='source/key_z.webp' width='40%'></td>  <td><h1>Hit</h1></td></tr>        <tr><td><img src='source/key_x.webp' width='40%'></td>  <td><h1>Shot</h1></td></tr></table>";
 
 
     var button_back = document.createElement("a");
@@ -125,6 +123,8 @@ document.getElementById("button_main_play").addEventListener('click', function (
     
 
     if(sessionStorage.token !== undefined){
+        loading();
+
         var url = 'https://gta-via-drobik.herokuapp.com/sing_in_token';
         
         var ip = sessionStorage.getItem('ip');
@@ -142,6 +142,8 @@ document.getElementById("button_main_play").addEventListener('click', function (
 
       
         $.post(url, content, function(data, status){
+            $("#loading").remove();
+
             data = JSON.parse(data);
             if(data['1'] == "Bad"){
                 log(1);
@@ -205,6 +207,7 @@ document.getElementById("button_main_play").addEventListener('click', function (
         }
 
         if(check_input()){
+            loading();
 
             var ip = sessionStorage.getItem('ip');
             var agent = navigator.userAgent;
@@ -227,6 +230,8 @@ document.getElementById("button_main_play").addEventListener('click', function (
 
 
             $.post(url, content, function(data, status){
+                $("#loading").remove();
+
                 data = JSON.parse(data);
 
                 console.log(data);
@@ -282,6 +287,7 @@ document.getElementById("button_main_play").addEventListener('click', function (
         
 
         function send_request(){
+            loading();
 
             var url = 'https://gta-via-drobik.herokuapp.com/sing_up';
             
@@ -303,6 +309,8 @@ document.getElementById("button_main_play").addEventListener('click', function (
             };
 
             $.post(url, content, function(data, status){
+                $("#loading").remove();
+
                 if(data == "Bad_email"){
                     log(5);
                 }
@@ -388,6 +396,7 @@ function log(a){
 
 function logged(){
     $("#announcement").remove();
+    $("#loading").remove();
     $("#login_form").fadeOut();
 
     log(21);
@@ -395,7 +404,7 @@ function logged(){
     var menu = document.createElement("div");
     document.body.appendChild(menu);
     menu.setAttribute("id", "menu");
-    menu.innerHTML = "<h1>Witaj: " + JSON.parse(window.sessionStorage.getItem('name_user'))[0] + "!</h1>" + "<div id='menu_child'> <div id='menu_child_1'><a class='btn-slice'> <div class='top'><span>Singleplayer</span></div><div class='bottom'><span>Singleplayer</span></div></a></div>       <div style='pointer-events:none;' id='menu_child_2'><a class='btn-slice'> <div class='top'><span>Multiplayer</span></div><div class='bottom'><span>Multiplayer</span></div></a></div>  </div>        <div id='log_out'> <a class='btn-slice'> <div class='top'><span>Log out</span></div><div class='bottom'><span>Log out</span></div></a></div>";
+    menu.innerHTML = "<h1>Hi   " + JSON.parse(window.sessionStorage.getItem('name_user'))[0] + "</h1>" + "<div id='menu_child'> <div id='menu_child_1'><a class='btn-slice'> <div class='top'><span>Singleplayer</span></div><div class='bottom'><span>Singleplayer</span></div></a></div>       <div style='pointer-events:none;' id='menu_child_2'><a class='btn-slice'> <div class='top'><span>Multiplayer</span></div><div class='bottom'><span>Multiplayer</span></div></a></div>  </div>        <div id='log_out'> <a class='btn-slice'> <div class='top'><span>Log out</span></div><div class='bottom'><span>Log out</span></div></a></div>";
 
     document.getElementById("menu_child_1").addEventListener("click", function(){
         step_2();
@@ -422,20 +431,24 @@ function logged(){
 
 
     function step_2(){
-        menu.innerHTML = "<h1>Witaj: " + JSON.parse(window.sessionStorage.getItem('name_user'))[0] + "!</h1>" + "<div id='menu_child'> <div id='menu_child_1'><a class='btn-slice'> <div class='top'><span>New game</span></div><div class='bottom'><span>New game</span></div></a></div>       <div id='menu_child_2'><a class='btn-slice'> <div class='top'><span>Load save</span></div><div class='bottom'><span>Load save</span></div></a></div>  </div>             <div id='log_out'> <a class='btn-slice'> <div class='top'><span>Log out</span></div><div class='bottom'><span>Log out</span></div></a></div>";
+        menu.innerHTML = "<h1>Hi   " + JSON.parse(window.sessionStorage.getItem('name_user'))[0] + "</h1>" + "<div id='menu_child'> <div id='menu_child_1'><a class='btn-slice'> <div class='top'><span>New game</span></div><div class='bottom'><span>New game</span></div></a></div>       <div id='menu_child_2'><a class='btn-slice'> <div class='top'><span>Load save</span></div><div class='bottom'><span>Load save</span></div></a></div>  </div>             <div id='log_out'> <a class='btn-slice'> <div class='top'><span>Log out</span></div><div class='bottom'><span>Log out</span></div></a></div>";
 
         document.getElementById("menu_child_1").addEventListener("click", function(){
+            loading()
             window.sessionStorage.setItem('record', "new");
             window.location.href = "play/index.html";
         }, { once: true });
     
         document.getElementById("menu_child_2").addEventListener("click", function(){
+            loading();
             window.sessionStorage.setItem('record', "saved");
             window.location.href = "play/index.html";
         }, { once: true });
 
 
         document.getElementById("log_out").addEventListener("click", function(){
+            loading();
+
             var url = 'https://gta-via-drobik.herokuapp.com/close_session';
             var content = {
                 "ip": sessionStorage.getItem('ip'),
@@ -470,6 +483,6 @@ signInButton.addEventListener("click", () => {
 
 
 
-if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
-    alert("Przepraszamy!!! Brak obługi urządzeń moblinych!");
-  }
+// if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+//     alert("Przepraszamy!!! Brak obługi urządzeń moblinych!");
+//   }
