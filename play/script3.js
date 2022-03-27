@@ -5,6 +5,12 @@ document.body.setAttribute("oncontextmenu", "return false");
 
 
 
+var screen_load =  document.createElement("div");
+document.body.appendChild(screen_load);
+screen_load.setAttribute("id", "screen_load");
+screen_load.innerHTML = "<p>Game is loading...</p>";
+
+
 
 if ((new URLSearchParams(window.location.search).get('i')) == 1){
   play();
@@ -103,11 +109,6 @@ function load(){
   window.sessionStorage.removeItem('mode');
   window.sessionStorage.removeItem('record');
 
-
-  var screen_load =  document.createElement("div");
-  document.body.appendChild(screen_load);
-  screen_load.setAttribute("id", "screen_load");
-  screen_load.innerHTML = "<p>Game is loading...</p>";
 
   $("#window").remove();
 
