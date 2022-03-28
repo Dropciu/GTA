@@ -119,33 +119,33 @@ function load(){
 
 
 
-  var hp_element =  document.createElement("div");
-  document.body.appendChild(hp_element);
-  hp_element.setAttribute("id", "hp_element");
-
-  var hp_element2 =  document.createElement("div");
-  hp_element.appendChild(hp_element2);
-  hp_element2.setAttribute("id", "hp_element2");
-
-
-  var money_element = document.createElement("div");
-  document.body.appendChild(money_element);
-  money_element.setAttribute("id", "money_element");
-  money_element.innerHTML = "<h1>" + b.money + " $</h1>";
-
-
-  check_money();
-  check_hp();
-
   
   setTimeout(() => {
     $(document).ready( function() {
       $("#loading_element").remove();
+      var hp_element =  document.createElement("div");
+      document.body.appendChild(hp_element);
+      hp_element.setAttribute("id", "hp_element");
+
+      var hp_element2 =  document.createElement("div");
+      hp_element.appendChild(hp_element2);
+      hp_element2.setAttribute("id", "hp_element2");
+
+
+      var money_element = document.createElement("div");
+      document.body.appendChild(money_element);
+      money_element.setAttribute("id", "money_element");
+      money_element.innerHTML = "<h1>" + b.money + " $</h1>";
+      
 
       play();
 
       setTimeout(() => {
         $("#screen_load").remove();
+
+
+        check_money();
+        check_hp();
       }, 100);
 
     })
