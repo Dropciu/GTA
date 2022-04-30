@@ -5,15 +5,12 @@ document.body.setAttribute("oncontextmenu", "return false");
 
 
 
-var screen_load =  document.createElement("div");
-document.body.appendChild(screen_load);
-screen_load.setAttribute("id", "screen_load");
-screen_load.innerHTML = "<p>Game is loading...</p>";
-
-
 
 if ((new URLSearchParams(window.location.search).get('i')) == 1){
   play();
+}
+else if(sessionStorage.mode == "demo"){
+  load();
 }
 else if(sessionStorage.token !== undefined && sessionStorage.mode != null && sessionStorage.record != null){
 
@@ -112,10 +109,6 @@ function load(){
 
   $("#window").remove();
 
-  var loading_element =  document.createElement("div");
-  document.body.appendChild(loading_element);
-  loading_element.setAttribute("id", "loading_element");
-  loading_element.innerHTML = "<img src='img/atak.webp'> <img src='img/auto1.webp'> <img src='img/auto2.webp'> <img src='img/auto3.webp'> <img src='img/auto4.webp'> <img src='img/auto5.webp'> <img src='img/auto6.webp'> <img src='img/auto7.webp'> <img src='img/bohater_główny.webp'> <img src='img/osoba.webp'> <img src='img/osoba2.webp'> <img src='img/osoba3.webp'> <img src='img/pocisk.webp'> <img src='img/skok.webp'> <img src='img/ruch.webp'> <img src='img/strzał.webp'> <img src='img/trup_1.webp'> <img src='img/trup_1_2.webp'> <img src='img/trup_1_3.webp'> <img src='img/trup_2.webp'> <img src='img/trup_2_2.webp'> <img src='img/trup_2_3.webp'> <img src='img/trup_3.webp'> <img src='img/trup_3_2.webp'> <img src='img/trup_3_3.webp'> <img src='img/cios.webp'> <img src='img/tło.webp'> <img src='img/upadek.webp'>";
 
 
 
