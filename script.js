@@ -72,6 +72,12 @@ function loading(){
 
 
 
+document.getElementById("button_demo").addEventListener("click", function(){
+    loading();
+
+    window.sessionStorage.setItem('mode', "demo");
+    window.location.href = "play/index.html";
+})
 
 document.getElementById("button_control").addEventListener('click', function () {
     var screen_control = document.createElement("div");
